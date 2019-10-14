@@ -2,25 +2,31 @@ package feeds2html
 
 import (
 	"bufio"
+	"github.com/Lepovirta/keruu/feeds2html/template"
 	"github.com/mmcdole/gofeed"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
 type Config struct {
 	HTTPTimeout time.Duration
+	MaxItems    int
 }
 
 func DefaultConfig() *Config {
 	return &Config{
 		HTTPTimeout: time.Second * 10,
+		MaxItems:    1000,
 	}
 }
 
 type Feeds2HTML struct {
+	config     *Config
 	feedParser *gofeed.Parser
+	feedItems  []*gofeed.Item
 }
 
 func New(config *Config) *Feeds2HTML {
@@ -30,46 +36,57 @@ func New(config *Config) *Feeds2HTML {
 	}
 
 	return &Feeds2HTML{
+		config:     config,
 		feedParser: feedParser,
+		feedItems:  make([]*gofeed.Item, 0, 5000),
 	}
 }
 
-func (f *Feeds2HTML) FromStream(feeds io.Reader, html io.Writer) error {
-	bufHTML := bufio.NewWriter(html)
-	if _, err := bufHTML.WriteString(htmlHeaderStr); err != nil {
-		return err
-	}
-
+func (f *Feeds2HTML) FromStream(feeds io.Reader, out io.Writer) error {
+	// Fetch feeds
 	feedScanner := bufio.NewScanner(feeds)
 	for feedScanner.Scan() {
 		feedURLStr := feedScanner.Text()
-		if err := f.feedToHTML(feedURLStr, bufHTML); err != nil {
+		feedURLStr = strings.TrimSpace(feedURLStr)
+		if feedURLStr == "" {
+			break
+		}
+		if err := f.fetchItems(feedURLStr); err != nil {
 			log.Printf("error processing feed '%s': %s", feedURLStr, err)
 		}
 	}
 
 	if err := feedScanner.Err(); err != nil {
-		return err
+		log.Printf("error reading feed links: %s", err)
 	}
 
-	if _, err := bufHTML.WriteString(htmlFooterStr); err != nil {
-		return err
-	}
+	// Sort and slice
+	sortItemsByTime(f.feedItems)
+	f.feedItems = f.feedItems[0:f.config.MaxItems]
 
-	if err := bufHTML.Flush(); err != nil {
-		return err
-	}
-
-	return nil
+	// Write output
+	return f.writeHTML(out)
 }
 
-func (f *Feeds2HTML) feedToHTML(feedURLStr string, html *bufio.Writer) error {
+func (f *Feeds2HTML) fetchItems(feedURLStr string) error {
 	feed, err := f.feedParser.ParseURL(feedURLStr)
 	if err != nil {
 		return err
 	}
-
-	htmlFeedTemplate.Execute(html, feed)
-
+	f.feedItems = append(f.feedItems, feed.Items...)
 	return nil
+}
+
+func (f *Feeds2HTML) writeHTML(w io.Writer) (err error) {
+	bufw := bufio.NewWriter(w)
+
+	err = template.Render(bufw, &template.Data{
+		Items: f.feedItems,
+	})
+	if err != nil {
+		return
+	}
+
+	err = bufw.Flush()
+	return
 }
