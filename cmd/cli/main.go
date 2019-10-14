@@ -1,12 +1,13 @@
 package main
 
 import (
-	"os"
 	"github.com/Lepovirta/keruu/feeds2html"
+	"os"
 )
 
 func main() {
-	if err := feeds2html.FromStream(os.Stdin, os.Stdout); err != nil {
+	conf := feeds2html.DefaultConfig()
+	if err := feeds2html.New(conf).FromStream(os.Stdin, os.Stdout); err != nil {
 		panic(err)
 	}
 }

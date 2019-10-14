@@ -1,48 +1,40 @@
 package feeds2html
 
 import (
-	"io"
 	"bufio"
-	"log"
 	"github.com/mmcdole/gofeed"
-	"html/template"
+	"io"
+	"log"
+	"net/http"
+	"time"
 )
 
-const (
-	htmlHeaderStr = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Keruu</title>
-  <meta name="description" content="Keruu">
-</head>
-<body>
-<ul>`
-	htmlFooterStr = `</ul>
-</body>
-</html>
-`
-	htmlFeedTemplateStr = `
-{{- range $count, $item := .Items }}
-<li><a href="{{ .Link }}">{{ .Title }}</a></li>
-{{- end }}
-`
-)
+type Config struct {
+	HTTPTimeout time.Duration
+}
 
-var (
-	htmlFeedTemplate *template.Template
-)
-
-func init() {
-	var err error
-	
-	htmlFeedTemplate, err = template.New("feed").Parse(htmlFeedTemplateStr)
-	if err != nil {
-		panic(err)
+func DefaultConfig() *Config {
+	return &Config{
+		HTTPTimeout: time.Second * 10,
 	}
 }
 
-func FromStream(feeds io.Reader, html io.Writer) error {
+type Feeds2HTML struct {
+	feedParser *gofeed.Parser
+}
+
+func New(config *Config) *Feeds2HTML {
+	feedParser := gofeed.NewParser()
+	feedParser.Client = &http.Client{
+		Timeout: config.HTTPTimeout,
+	}
+
+	return &Feeds2HTML{
+		feedParser: feedParser,
+	}
+}
+
+func (f *Feeds2HTML) FromStream(feeds io.Reader, html io.Writer) error {
 	bufHTML := bufio.NewWriter(html)
 	if _, err := bufHTML.WriteString(htmlHeaderStr); err != nil {
 		return err
@@ -51,7 +43,7 @@ func FromStream(feeds io.Reader, html io.Writer) error {
 	feedScanner := bufio.NewScanner(feeds)
 	for feedScanner.Scan() {
 		feedURLStr := feedScanner.Text()
-		if err := feedToHTML(feedURLStr, bufHTML); err != nil {
+		if err := f.feedToHTML(feedURLStr, bufHTML); err != nil {
 			log.Printf("error processing feed '%s': %s", feedURLStr, err)
 		}
 	}
@@ -71,9 +63,8 @@ func FromStream(feeds io.Reader, html io.Writer) error {
 	return nil
 }
 
-func feedToHTML(feedURLStr string, html *bufio.Writer) error {
-	feedParser := gofeed.NewParser()
-	feed, err := feedParser.ParseURL(feedURLStr)
+func (f *Feeds2HTML) feedToHTML(feedURLStr string, html *bufio.Writer) error {
+	feed, err := f.feedParser.ParseURL(feedURLStr)
 	if err != nil {
 		return err
 	}
