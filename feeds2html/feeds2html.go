@@ -8,10 +8,12 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
 type Config struct {
+	FeedURLs    []string
 	HTTPTimeout time.Duration
 	MaxItems    int
 }
@@ -23,65 +25,87 @@ func DefaultConfig() *Config {
 	}
 }
 
-type Feeds2HTML struct {
+type state struct {
 	config     *Config
 	feedParser *gofeed.Parser
+	feedItemCh chan []*gofeed.Item
 	feedItems  []*gofeed.Item
 }
 
-func New(config *Config) *Feeds2HTML {
+func newState(config *Config) *state {
 	feedParser := gofeed.NewParser()
 	feedParser.Client = &http.Client{
 		Timeout: config.HTTPTimeout,
 	}
 
-	return &Feeds2HTML{
+	return &state{
 		config:     config,
 		feedParser: feedParser,
+		feedItemCh: make(chan []*gofeed.Item, 100),
 		feedItems:  make([]*gofeed.Item, 0, 5000),
 	}
 }
 
-func (f *Feeds2HTML) FromStream(feeds io.Reader, out io.Writer) error {
+// Run fetches feeds specified in the config and outputs an HTML document for them
+func Run(config *Config, out io.Writer) error {
+	return newState(config).run(out)
+}
+
+func (s *state) run(out io.Writer) error {
+	var wgJoiner sync.WaitGroup
+	var wgFeeds sync.WaitGroup
+
+	// Start feed item joiner
+	wgJoiner.Add(1)
+	go s.joinFeedItems(&wgJoiner)
+
 	// Fetch feeds
-	feedScanner := bufio.NewScanner(feeds)
-	for feedScanner.Scan() {
-		feedURLStr := feedScanner.Text()
-		feedURLStr = strings.TrimSpace(feedURLStr)
-		if feedURLStr == "" {
-			break
-		}
-		if err := f.fetchItems(feedURLStr); err != nil {
-			log.Printf("error processing feed '%s': %s", feedURLStr, err)
-		}
+	for _, url := range s.config.FeedURLs {
+		wgFeeds.Add(1)
+		go s.fetchFeed(url, &wgFeeds)
 	}
 
-	if err := feedScanner.Err(); err != nil {
-		log.Printf("error reading feed links: %s", err)
-	}
-
-	// Sort and slice
-	sortItemsByTime(f.feedItems)
-	f.feedItems = f.feedItems[0:f.config.MaxItems]
-
-	// Write output
-	return f.writeHTML(out)
+	wgFeeds.Wait()
+	close(s.feedItemCh)
+	wgJoiner.Wait()
+	s.postProcess()
+	return s.writeHTML(out)
 }
 
-func (f *Feeds2HTML) fetchItems(feedURLStr string) error {
-	feed, err := f.feedParser.ParseURL(feedURLStr)
+func (s *state) joinFeedItems(wg *sync.WaitGroup) {
+	defer wg.Done()
+	for items := range s.feedItemCh {
+		s.feedItems = append(s.feedItems, items...)
+	}
+}
+
+func (s *state) fetchFeed(url string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	url = strings.TrimSpace(url)
+	if url == "" {
+		return
+	}
+
+	feed, err := s.feedParser.ParseURL(url)
 	if err != nil {
-		return err
+		log.Printf("error processing feed '%s': %s", url, err)
 	}
-	f.feedItems = append(f.feedItems, feed.Items...)
-	return nil
+	s.feedItemCh <- feed.Items
+
+	return
 }
 
-func (f *Feeds2HTML) writeHTML(w io.Writer) (err error) {
+func (s *state) postProcess() {
+	sortItemsByTime(s.feedItems)
+	s.feedItems = s.feedItems[0:s.config.MaxItems]
+}
+
+func (s *state) writeHTML(w io.Writer) (err error) {
 	bufw := bufio.NewWriter(w)
 
 	err = template.Render(bufw, &template.Data{
-		Items: f.feedItems,
+		Items: s.feedItems,
 	})
 	if err != nil {
 		return

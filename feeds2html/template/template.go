@@ -34,7 +34,7 @@ var (
 func init() {
 	var err error
 
-	htmlTemplate, err = template.New("feed").Parse(templateStr)
+	htmlTemplate, err = template.New("").Parse(templateStr)
 	if err != nil {
 		panic(err)
 	}
