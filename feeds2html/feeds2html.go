@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 
 	"github.com/mmcdole/gofeed"
@@ -39,6 +38,9 @@ func newState(config *Config) *state {
 
 // Run fetches feeds specified in the config and outputs an HTML document for them
 func Run(config *Config, out io.Writer) error {
+	if err := config.Validate(); err != nil {
+		return err
+	}
 	return newState(config).run(out)
 }
 
@@ -51,7 +53,7 @@ func (s *state) run(out io.Writer) error {
 	go s.joinFeedItems(&wgJoiner)
 
 	// Fetch feeds
-	for _, url := range s.config.FeedURLs {
+	for _, url := range s.config.Feeds {
 		wgFeeds.Add(1)
 		go s.fetchFeed(url, &wgFeeds)
 	}
@@ -73,15 +75,10 @@ func (s *state) joinFeedItems(wg *sync.WaitGroup) {
 	}
 }
 
-func (s *state) fetchFeed(url string, wg *sync.WaitGroup) {
+func (s *state) fetchFeed(url URL, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	url = strings.TrimSpace(url)
-	if url == "" {
-		return
-	}
-
-	feed, err := s.feedParser.ParseURL(url)
+	feed, err := s.feedParser.ParseURL(url.String())
 	if err != nil {
 		log.Printf("error processing feed '%s': %s", url, err)
 		return
