@@ -1,9 +1,10 @@
 package template
 
 import (
-	"github.com/mmcdole/gofeed"
 	"html/template"
 	"io"
+
+	"github.com/Lepovirta/keruu/feeds2html/data"
 )
 
 const (
@@ -11,17 +12,37 @@ const (
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Keruu</title>
-  <meta name="description" content="Keruu">
+  <meta content="width=device-width,initial-scale=1" name="viewport">
+  <title>{{ .Details.Title }}</title>
+  <meta name="description" content="{{ .Details.Description }}">
+  <meta property="og:title" content="{{ .Details.Title }}">
+  <meta property="og:site_name" content="{{ .Details.Title }}">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="{{ .Details.Description }}">
+  <style>{{ .Details.CSS }}</style>
 </head>
 <body>
-<ul>
-{{- range $count, $item := .Items }}
-{{- with $item }}
-<li><a href="{{ .Link }}">{{ .Title }}</a></li>
-{{- end }}
-{{- end }}
-</ul>
+<div class="wrapper">
+  <header>
+    <h1 class="title">{{ .Details.Title }}</h1>
+    <p class="description">{{ .Details.Description }}</p>
+  </header>
+  <ul class="post-list">
+  {{- range $count, $post := .Posts }}
+  {{- with $post }}
+    <li>
+      <a class="post-title" href="{{ .Link }}">{{ .Title }}</a>
+      <span class="post-hostname">{{ .Hostname }}</span>
+      <span class="post-time">{{ .FormattedTime }}</span>
+    </li>
+  {{- end }}
+  {{- end }}
+  </ul>
+  <footer>
+    Generated using <a href="https://github.com/Lepovirta/keruu">keruu</a>
+    at {{ .FormattedTime }}.
+  </footer>
+</div>
 </body>
 </html>
 `
@@ -40,10 +61,7 @@ func init() {
 	}
 }
 
-type Data struct {
-	Items []*gofeed.Item
-}
-
-func Render(w io.Writer, data *Data) error {
-	return htmlTemplate.Execute(w, data)
+// Render writes the given aggregation to the given writer in HTML format
+func Render(w io.Writer, aggregation *data.Aggregation) error {
+	return htmlTemplate.Execute(w, aggregation)
 }

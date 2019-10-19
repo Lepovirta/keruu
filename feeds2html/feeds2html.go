@@ -2,34 +2,36 @@ package feeds2html
 
 import (
 	"bufio"
-	"github.com/Lepovirta/keruu/feeds2html/template"
-	"github.com/mmcdole/gofeed"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Lepovirta/keruu/feeds2html/data"
+	"github.com/Lepovirta/keruu/feeds2html/template"
+	"github.com/mmcdole/gofeed"
 )
 
 type Config struct {
 	FeedURLs    []string
 	HTTPTimeout time.Duration
-	MaxItems    int
+	Details     *data.AggregationDetails
 }
 
 func DefaultConfig() *Config {
 	return &Config{
 		HTTPTimeout: time.Second * 10,
-		MaxItems:    1000,
+		Details:     data.DefaultAggregationDetails(),
 	}
 }
 
 type state struct {
-	config     *Config
-	feedParser *gofeed.Parser
-	feedItemCh chan []*gofeed.Item
-	feedItems  []*gofeed.Item
+	config      *Config
+	feedParser  *gofeed.Parser
+	postCh      chan *data.Post
+	aggregation *data.Aggregation
 }
 
 func newState(config *Config) *state {
@@ -38,11 +40,16 @@ func newState(config *Config) *state {
 		Timeout: config.HTTPTimeout,
 	}
 
+	aggregation := &data.Aggregation{
+		Details: config.Details,
+		Posts:   make([]*data.Post, 0, 5000),
+	}
+
 	return &state{
-		config:     config,
-		feedParser: feedParser,
-		feedItemCh: make(chan []*gofeed.Item, 100),
-		feedItems:  make([]*gofeed.Item, 0, 5000),
+		config:      config,
+		feedParser:  feedParser,
+		postCh:      make(chan *data.Post, 100),
+		aggregation: aggregation,
 	}
 }
 
@@ -66,7 +73,7 @@ func (s *state) run(out io.Writer) error {
 	}
 
 	wgFeeds.Wait()
-	close(s.feedItemCh)
+	close(s.postCh)
 	wgJoiner.Wait()
 	s.postProcess()
 	return s.writeHTML(out)
@@ -74,8 +81,8 @@ func (s *state) run(out io.Writer) error {
 
 func (s *state) joinFeedItems(wg *sync.WaitGroup) {
 	defer wg.Done()
-	for items := range s.feedItemCh {
-		s.feedItems = append(s.feedItems, items...)
+	for post := range s.postCh {
+		s.aggregation.Push(post)
 	}
 }
 
@@ -90,23 +97,28 @@ func (s *state) fetchFeed(url string, wg *sync.WaitGroup) {
 	feed, err := s.feedParser.ParseURL(url)
 	if err != nil {
 		log.Printf("error processing feed '%s': %s", url, err)
+		return
 	}
-	s.feedItemCh <- feed.Items
+	for _, item := range feed.Items {
+		post, err := data.GoFeedItemToPost(item)
+		if err != nil {
+			log.Printf("error processing post: %s", err)
+			break
+		}
+		s.postCh <- post
+	}
 
 	return
 }
 
 func (s *state) postProcess() {
-	sortItemsByTime(s.feedItems)
-	s.feedItems = s.feedItems[0:s.config.MaxItems]
+	s.aggregation.Finalize()
 }
 
 func (s *state) writeHTML(w io.Writer) (err error) {
 	bufw := bufio.NewWriter(w)
 
-	err = template.Render(bufw, &template.Data{
-		Items: s.feedItems,
-	})
+	err = template.Render(bufw, s.aggregation)
 	if err != nil {
 		return
 	}
