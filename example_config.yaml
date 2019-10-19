@@ -1,0 +1,23 @@
+aggregation:
+  title: Keruu
+  maxItems: 200
+
+fetch:
+  httpTimeout: 10s
+
+feeds:
+- http://sreweekly.com/feed/
+- https://www.devopsgroup.com/feed/
+- https://medium.com/feed/faun
+- https://medium.com/feed/@NetflixTechBlog
+- https://medium.com/feed/@jerub
+- https://medium.com/feed/@copyconstruct
+- https://www.gremlin.com/rss.xml
+- http://feeds.feedburner.com/HighScalability
+- https://www.honeycomb.io/feed/
+- http://www.golangdevops.com/rss/
+- http://lambda-the-ultimate.org/rss.xml
+- http://www.brendangregg.com/blog/rss.xml
+- https://jvns.ca/atom.xml
+- https://rachelbythebay.com/w/atom.xml
+- https://lepovirta.org/posts/index.xml
