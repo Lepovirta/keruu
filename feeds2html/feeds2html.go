@@ -7,48 +7,32 @@ import (
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 
-	"github.com/Lepovirta/keruu/feeds2html/data"
-	"github.com/Lepovirta/keruu/feeds2html/template"
 	"github.com/mmcdole/gofeed"
 )
-
-type Config struct {
-	FeedURLs    []string
-	HTTPTimeout time.Duration
-	Details     *data.AggregationDetails
-}
-
-func DefaultConfig() *Config {
-	return &Config{
-		HTTPTimeout: time.Second * 10,
-		Details:     data.DefaultAggregationDetails(),
-	}
-}
 
 type state struct {
 	config      *Config
 	feedParser  *gofeed.Parser
-	postCh      chan *data.Post
-	aggregation *data.Aggregation
+	postCh      chan *feedPost
+	aggregation *aggregation
 }
 
 func newState(config *Config) *state {
 	feedParser := gofeed.NewParser()
 	feedParser.Client = &http.Client{
-		Timeout: config.HTTPTimeout,
+		Timeout: config.Fetch.HTTPTimeout,
 	}
 
-	aggregation := &data.Aggregation{
-		Details: config.Details,
-		Posts:   make([]*data.Post, 0, 5000),
+	aggregation := &aggregation{
+		Config: config.Aggregation,
+		Posts:  make([]*feedPost, 0, 5000),
 	}
 
 	return &state{
 		config:      config,
 		feedParser:  feedParser,
-		postCh:      make(chan *data.Post, 100),
+		postCh:      make(chan *feedPost, 100),
 		aggregation: aggregation,
 	}
 }
@@ -72,9 +56,12 @@ func (s *state) run(out io.Writer) error {
 		go s.fetchFeed(url, &wgFeeds)
 	}
 
+	// Wait for everything to finish
 	wgFeeds.Wait()
 	close(s.postCh)
 	wgJoiner.Wait()
+
+	// Post-process and write output
 	s.postProcess()
 	return s.writeHTML(out)
 }
@@ -82,7 +69,7 @@ func (s *state) run(out io.Writer) error {
 func (s *state) joinFeedItems(wg *sync.WaitGroup) {
 	defer wg.Done()
 	for post := range s.postCh {
-		s.aggregation.Push(post)
+		s.aggregation.push(post)
 	}
 }
 
@@ -100,7 +87,7 @@ func (s *state) fetchFeed(url string, wg *sync.WaitGroup) {
 		return
 	}
 	for _, item := range feed.Items {
-		post, err := data.GoFeedItemToPost(item)
+		post, err := goFeedItemToPost(item)
 		if err != nil {
 			log.Printf("error processing post: %s", err)
 			break
@@ -112,13 +99,13 @@ func (s *state) fetchFeed(url string, wg *sync.WaitGroup) {
 }
 
 func (s *state) postProcess() {
-	s.aggregation.Finalize()
+	s.aggregation.finalize()
 }
 
 func (s *state) writeHTML(w io.Writer) (err error) {
 	bufw := bufio.NewWriter(w)
 
-	err = template.Render(bufw, s.aggregation)
+	err = renderHTML(bufw, s.aggregation)
 	if err != nil {
 		return
 	}
