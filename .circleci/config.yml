@@ -1,0 +1,31 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.4
+
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: go mod download
+      - run:
+          name: Test
+          command: go test -race -coverpkg ./... -coverprofile=coverage.txt -covermode=atomic ./...
+      - run:
+          name: Build
+          command: go build
+      - codecov/upload:
+          file: coverage.txt
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /.*/
