@@ -15,7 +15,6 @@ Keruu accepts the following CLI flags:
 
 * `-config`: Path to the configuration file (default: read from STDIN)
 * `-output`: Path to the HTML output file (default: write to STDOUT)
-* `-version`: Displays the current version
 * `-help`: Displays how to use Keruu
 
 ## Configuration
