@@ -24,7 +24,7 @@ func newState(config *Config) *state {
 	}
 
 	aggregation := &aggregation{
-		Config: config.Aggregation,
+		Config: &config.Aggregation,
 		Posts:  make([]*feedPost, 0, 5000),
 	}
 

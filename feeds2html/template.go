@@ -45,8 +45,7 @@ const (
 </html>
 `
 
-  defaultCSS = `
-body {
+  defaultCSS = `body {
   background-color: #f1e8fc;
   padding: 0;
   margin: 0;
