@@ -50,7 +50,7 @@ func (a *aggregation) push(post *feedPost) {
 
 func (a *aggregation) finalize() {
 	sortPostsByTime(a.Posts)
-	a.Posts = a.Posts[0:a.Config.MaxItems]
+	a.Posts = a.Posts[0:a.Config.MaxPosts]
 	a.Time = time.Now()
 }
 
