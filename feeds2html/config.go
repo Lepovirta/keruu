@@ -22,7 +22,7 @@ fetch:
 aggregation:
   title: <STRING>
   description: <STRING>
-  maxItems: <NUMBER>
+  maxPosts: <NUMBER>
   css: <STRING>
 `
 
@@ -42,7 +42,7 @@ type FetchConfig struct {
 type AggregationConfig struct {
 	Title       string `yaml:"title,omitempty"`
 	Description string `yaml:"description,omitempty"`
-	MaxItems    int    `yaml:"maxItems,omitempty"`
+	MaxPosts    int    `yaml:"maxPosts,omitempty"`
 	CSSString   string `yaml:"css,omitempty"`
 }
 
@@ -55,7 +55,7 @@ func (c *Config) Init() {
 	c.Aggregation = AggregationConfig{
 		Title:       "Keruu",
 		Description: "Aggregation of posts",
-		MaxItems:    1000,
+		MaxPosts:    1000,
 		CSSString:   defaultCSS,
 	}
 }
@@ -114,7 +114,7 @@ func (c *FetchConfig) Validate() error {
 
 // Validate checks if the configuration is valid
 func (c *AggregationConfig) Validate() error {
-	if c.MaxItems <= 0 {
+	if c.MaxPosts <= 0 {
 		return fmt.Errorf("no point in limiting result size to 0")
 	}
 	return nil
