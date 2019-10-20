@@ -1,6 +1,6 @@
 aggregation:
   title: Keruu
-  maxItems: 200
+  maxPosts: 200
 
 fetch:
   httpTimeout: 10s
