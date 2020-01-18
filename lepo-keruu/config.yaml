@@ -1,5 +1,6 @@
 aggregation:
-  title: Keruu
+  title: Lepo Keruu
+  description: Aggregation of posts I find interesting
   maxPosts: 200
 
 fetch:
