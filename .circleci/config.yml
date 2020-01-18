@@ -6,9 +6,12 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - pkg-cache
       - run:
           name: Setup
           command: go mod download
@@ -17,9 +20,45 @@ jobs:
           command: go test -race -coverpkg ./... -coverprofile=coverage.txt -covermode=atomic ./...
       - run:
           name: Build
-          command: go build
+          environment:
+            CGO_ENABLED: "0"
+          command: go build -o keruu
+      - save_cache:
+          key: pkg-cache
+          paths:
+            - /go/pkg
+      - persist_to_workspace:
+          root: .
+          paths:
+            - keruu
+            - coverage.txt
+  upload-coverage:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - attach_workspace:
+          at: /tmp/keruu
       - codecov/upload:
-          file: coverage.txt
+          file: /tmp/keruu/coverage.txt
+  publish-site:
+    docker:
+      - image: lepovirta/lepo-build
+    steps:
+      - attach_workspace:
+          at: /tmp/keruu
+      - checkout
+      - run:
+          name: Prepare environment
+          working_directory: lepo-keruu
+          command: mkdir -p public
+      - run:
+          name: Generate site
+          working_directory: lepo-keruu
+          command: /tmp/keruu/keruu -config config.yaml -output public/index.html
+      - run:
+          name: Publish
+          working_directory: lepo-keruu
+          command: netlify deploy --prod
 
 workflows:
   version: 2
@@ -29,3 +68,29 @@ workflows:
           filters:
             branches:
               only: /.*/
+      - upload-coverage:
+          requires:
+            - build
+          filters:
+            branches:
+              only: /.*/
+      - publish-site:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+  lepo-keruu:
+    triggers:
+      - schedule:
+          cron: "0 5,15 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
+      - publish-site:
+          requires:
+            - build
