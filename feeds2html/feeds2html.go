@@ -53,9 +53,10 @@ func (s *state) run(out io.Writer) error {
 	go s.joinFeedItems(&wgJoiner)
 
 	// Fetch feeds
-	for _, url := range s.config.Feeds {
+	for _, feed := range s.config.Feeds {
 		wgFeeds.Add(1)
-		go s.fetchFeed(url, &wgFeeds)
+		feed := feed
+		go s.fetchFeed(&feed, &wgFeeds)
 	}
 
 	// Wait for everything to finish
@@ -75,16 +76,16 @@ func (s *state) joinFeedItems(wg *sync.WaitGroup) {
 	}
 }
 
-func (s *state) fetchFeed(url URL, wg *sync.WaitGroup) {
+func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	feed, err := s.feedParser.ParseURL(url.String())
+	parsedFeed, err := s.feedParser.ParseURL(feed.URL.String())
 	if err != nil {
-		log.Printf("error processing feed '%s': %s", url, err)
+		log.Printf("error processing feed '%s': %s", feed.URL, err)
 		return
 	}
-	for _, item := range feed.Items {
-		post, err := goFeedItemToPost(item)
+	for _, item := range parsedFeed.Items {
+		post, err := goFeedItemToPost(feed, parsedFeed, item)
 		if err != nil {
 			log.Printf("error processing post: %s", err)
 			break

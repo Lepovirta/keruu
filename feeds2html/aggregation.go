@@ -1,7 +1,6 @@
 package feeds2html
 
 import (
-	"net/url"
 	"sort"
 	"time"
 
@@ -15,21 +14,29 @@ type aggregation struct {
 }
 
 type feedPost struct {
-	Title string
-	Link  *url.URL
-	Time  *time.Time
+	FeedName string
+	FeedLink string
+	Title    string
+	Link     string
+	Time     *time.Time
 }
 
-func goFeedItemToPost(item *gofeed.Item) (post *feedPost, err error) {
-	link, err := url.Parse(item.Link)
-	if err != nil {
-		return
+func goFeedItemToPost(
+	feed *Feed,
+	parsedFeed *gofeed.Feed,
+	item *gofeed.Item,
+) (post *feedPost, err error) {
+	feedName := feed.Name
+	if feedName == "" {
+		feedName = parsedFeed.Title
 	}
 
 	post = &feedPost{
-		Title: item.Title,
-		Link:  link,
-		Time:  timeFromGoFeedItem(item),
+		FeedName: feedName,
+		FeedLink: parsedFeed.Link,
+		Title:    item.Title,
+		Link:     item.Link,
+		Time:     timeFromGoFeedItem(item),
 	}
 
 	return
@@ -56,10 +63,6 @@ func (a *aggregation) finalize() {
 
 func (a *aggregation) FormattedTime() string {
 	return a.Time.Format("2006-01-02 15:04:05 -0700 MST")
-}
-
-func (p *feedPost) Hostname() string {
-	return p.Link.Hostname()
 }
 
 func (p *feedPost) FormattedTime() string {

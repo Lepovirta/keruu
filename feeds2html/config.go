@@ -14,8 +14,10 @@ import (
 
 // ConfigTemplateYAML is a YAML template for the config
 const ConfigTemplateYAML = `feeds:
-  - <URL>
-  - <URL>
+  - name: <NAME>
+    url: <URL>
+  - name: <NAME>
+    url: <URL>
   - ...
 fetch:
   httpTimeout: <DURATION>
@@ -28,9 +30,15 @@ aggregation:
 
 // Config contains the configuration for the entire feed fetching, aggregation, and rendering process
 type Config struct {
-	Feeds       []URL             `yaml:"feeds"`
+	Feeds       []Feed            `yaml:"feeds"`
 	Fetch       FetchConfig       `yaml:"fetch,omitempty"`
 	Aggregation AggregationConfig `yaml:"aggregation,omitempty"`
+}
+
+// Feed contains the details of a single feed
+type Feed struct {
+	Name string `yaml:"name"`
+	URL  URL    `yaml:"url"`
 }
 
 // FetchConfig contains the feed fetching related configurations

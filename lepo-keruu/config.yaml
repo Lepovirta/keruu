@@ -7,18 +7,29 @@ fetch:
   httpTimeout: 10s
 
 feeds:
-- http://sreweekly.com/feed/
-- https://www.devopsgroup.com/feed/
-- https://medium.com/feed/faun
-- https://medium.com/feed/@NetflixTechBlog
-- https://medium.com/feed/@jerub
-- https://medium.com/feed/@copyconstruct
-- https://www.gremlin.com/rss.xml
-- http://feeds.feedburner.com/HighScalability
-- https://www.honeycomb.io/feed/
-- http://www.golangdevops.com/rss/
-- http://lambda-the-ultimate.org/rss.xml
-- http://www.brendangregg.com/blog/rss.xml
-- https://jvns.ca/atom.xml
-- https://rachelbythebay.com/w/atom.xml
-- https://lepovirta.org/posts/index.xml
+- name: SRE Weekly
+  url: http://sreweekly.com/feed/
+- name: Netflix Tech Blog
+  url: https://medium.com/feed/@NetflixTechBlog
+- name: Stephen Thorne
+  url: https://medium.com/feed/@jerub
+- name: Cindy Sridharan
+  url: https://medium.com/feed/@copyconstruct
+- name: Gremlin
+  url: https://www.gremlin.com/rss.xml
+- name: High Scalability
+  url: http://feeds.feedburner.com/HighScalability
+- name: Honeycomb
+  url: https://www.honeycomb.io/feed/
+- name: GopherSRE
+  url: http://www.golangdevops.com/rss/
+- name: Lambda the Ultimate
+  url: http://lambda-the-ultimate.org/rss.xml
+- name: Brendan Gregg
+  url: http://www.brendangregg.com/blog/rss.xml
+- name: Julia Evans
+  url: https://jvns.ca/atom.xml
+- name: rachelbythebay
+  url: https://rachelbythebay.com/w/atom.xml
+- name: Lepovirta
+  url: https://lepovirta.org/posts/index.xml

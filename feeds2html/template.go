@@ -30,7 +30,7 @@ const (
   {{- with $post }}
     <li>
       <a class="post-title" href="{{ .Link }}">{{ .Title }}</a>
-      <span class="post-hostname">{{ .Hostname }}</span>
+      <a class="post-feed-name" href="{{ .FeedLink }}">{{ .FeedName }}</a>
       <span class="post-time">{{ .FormattedTime }}</span>
     </li>
   {{- end }}
@@ -88,7 +88,7 @@ header {
   font-size: 1.2em;
 }
 
-.post-hostname {
+.post-feed-name {
   font-size: 0.9em;
   color: #f44;
 }
