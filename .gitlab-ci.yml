@@ -1,0 +1,61 @@
+image: golang:1.14
+
+stages:
+- build
+- deploy
+
+cache:
+  key: yup
+  paths:
+  - /go/pkg
+
+workflow:
+  rules:
+  - if: $CI_MERGE_REQUEST_ID
+  - if: $CI_COMMIT_BRANCH == "master"
+
+before_script:
+- go mod download
+
+lint:
+  stage: build
+  image: golangci/golangci-lint:v1.27.0
+  script:
+  - golangci-lint run -v
+  rules:
+  - if: $CI_PIPELINE_SOURCE != "schedule"
+
+test:
+  stage: build
+  script:
+  - go test -race -coverpkg ./... -coverprofile=coverage.txt -covermode=atomic ./...
+  after_script:
+  - bash <(curl -s https://codecov.io/bash)
+  rules:
+  - if: $CI_PIPELINE_SOURCE != "schedule"
+
+build:
+  stage: build
+  variables:
+    CGO_ENABLED: "0"
+  script:
+  - go build -o keruu
+  artifacts:
+    paths:
+    - keruu
+    expire_in: 3 days
+
+publish-site:
+  stage: deploy
+  image: registry.gitlab.com/lepovirta/lepo-build
+  before_script:
+  - cd lepo-keruu
+  - mkdir -p public
+  script:
+  - ../keruu -config config.yaml -output public/index.html
+  - cd public
+  - netlify deploy --prod
+  dependencies:
+  - build
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
