@@ -42,7 +42,7 @@ jobs:
           file: /tmp/keruu/coverage.txt
   publish-site:
     docker:
-      - image: lepovirta/lepo-build
+      - image: registry.gitlab.com/lepovirta/lepo-build
     steps:
       - attach_workspace:
           at: /tmp/keruu
