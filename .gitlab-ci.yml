@@ -48,14 +48,16 @@ build:
 publish-site:
   stage: deploy
   image: registry.gitlab.com/lepovirta/lepo-build
+  variables:
+    NETLIFY_DIRECTORY: public
   before_script:
-  - cd lepo-keruu
-  - mkdir -p public
+  - if [ "$CI_COMMIT_BRANCH" == "master" ]; then export NETLIFY_DRAFT=false; fi
+  - mkdir -p $NETLIFY_DIRECTORY
   script:
-  - ../keruu -config config.yaml -output public/index.html
-  - cd public
-  - netlify deploy --prod
+  - ./keruu -config lepo-keruu/config.yaml -output $NETLIFY_DIRECTORY/index.html
+  - netlify-deployer
   dependencies:
   - build
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
+  - if: $CI_MERGE_REQUEST_ID
