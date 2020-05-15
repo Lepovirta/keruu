@@ -92,8 +92,6 @@ func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
 		}
 		s.postCh <- post
 	}
-
-	return
 }
 
 func (s *state) postProcess() {
