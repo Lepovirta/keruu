@@ -37,7 +37,7 @@ const (
   {{- end }}
   </ul>
   <footer>
-    Generated using <a href="https://github.com/Lepovirta/keruu">keruu</a>
+    Generated using <a href="https://gitlab.com/lepovirta/keruu">keruu</a>
     at {{ .FormattedTime }}.
   </footer>
 </div>

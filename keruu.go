@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Lepovirta/keruu/feeds2html"
+	"gitlab.com/lepovirta/keruu/feeds2html"
 )
 
 var configPath string
