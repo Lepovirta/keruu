@@ -51,11 +51,10 @@ publish-site:
   variables:
     NETLIFY_DIRECTORY: public
   before_script:
-  - if [ "$CI_COMMIT_BRANCH" == "master" ]; then export NETLIFY_DRAFT=false; fi
   - mkdir -p $NETLIFY_DIRECTORY
   script:
   - ./keruu -config lepo-keruu/config.yaml -output $NETLIFY_DIRECTORY/index.html
-  - netlify-deployer
+  - gitlab-deploy-site
   dependencies:
   - build
   rules:
