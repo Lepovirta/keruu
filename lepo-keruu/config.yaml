@@ -1,7 +1,7 @@
 aggregation:
   title: Lepo Keruu
-  description: Aggregation of posts I find interesting
-  maxPosts: 200
+  description: Aggregation of interesting posts
+  maxPosts: 500
 
 fetch:
   httpTimeout: 10s
@@ -31,5 +31,20 @@ feeds:
   url: https://jvns.ca/atom.xml
 - name: rachelbythebay
   url: https://rachelbythebay.com/w/atom.xml
+- name: Red Hat Developer
+  url: https://developers.redhat.com/blog/feed/atom/
+- name: Fabien Sanglard
+  url: https://fabiensanglard.net/rss.xml
+- name: Dan Luu
+  url: https://danluu.com/atom.xml
+- name: The Sharp End
+  url: https://sharpend.io/feed.xml
+- name: Henrik Warne
+  url: https://henrikwarne.com/feed/
+- name: Jessie Frazelle
+  url: https://blog.jessfraz.com/index.xml
+- name: Polar Squad
+  url: https://medium.com/feed/polarsquad
 - name: Lepovirta
   url: https://lepovirta.org/posts/index.xml
+
