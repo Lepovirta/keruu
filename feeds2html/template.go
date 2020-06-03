@@ -20,7 +20,7 @@ const (
   <style>{{ .Config.CSS }}</style>
 </head>
 <body>
-<div class="wrapper">
+<main>
   <header>
     <h1 class="title">{{ .Config.Title }}</h1>
     <p class="description">{{ .Config.Description }}</p>
@@ -31,7 +31,7 @@ const (
     <li>
       <a class="post-title" href="{{ .Link }}">{{ .Title }}</a>
       <a class="post-feed-name" href="{{ .FeedLink }}">{{ .FeedName }}</a>
-      <span class="post-time">{{ .FormattedTime }}</span>
+      <time class="post-time" datetime="{{ .FormattedTime }}">{{ .FormattedTime }}</time>
     </li>
   {{- end }}
   {{- end }}
@@ -40,7 +40,7 @@ const (
     Generated using <a href="https://gitlab.com/lepovirta/keruu">keruu</a>
     at {{ .FormattedTime }}.
   </footer>
-</div>
+</main>
 </body>
 </html>
 `
@@ -52,7 +52,7 @@ const (
   font-family: sans-serif;
 }
 
-.wrapper {
+main {
   width: 700px;
   margin: 10px auto;
 }
@@ -62,6 +62,21 @@ header {
   color: #eee;
   padding: 5px 20px;
   margin: 0;
+}
+
+a {
+  color: #00e;
+}
+
+a:visited {
+  color: #551abb;
+}
+
+footer {
+  padding: 10px;
+  font-size: 0.9em;
+  text-align: right;
+  color: #444;
 }
 
 .title {
@@ -86,11 +101,17 @@ header {
 .post-title {
   display: block;
   font-size: 1.2em;
+  text-decoration: none;
 }
 
 .post-feed-name {
   font-size: 0.9em;
   color: #f44;
+  text-decoration: none;
+}
+
+.post-feed-name:visited {
+  color: #b22;
 }
 
 .post-time::before {
@@ -102,18 +123,37 @@ header {
   color: #484;
 }
 
-footer {
-  border-top: 2px solid #eee;
-  padding: 10px;
-  font-size: 0.9em;
-  text-align: right;
-  color: #444;
-}
-
 @media screen and (max-width:700px) {
-  .wrapper {
+  main {
     width: auto;
     margin: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #113;
+  }
+  a {
+    color: #aef;
+  }
+  a:visited {
+    color: #8be;
+  }
+  footer {
+    color: #baf;
+  }
+  .post-list {
+    background-color: #214;
+  }
+  .post-feed-name {
+    color: #f88;
+  }
+  .post-feed-name:visited {
+    color: #b66;
+  }
+  .post-time {
+    color: #8f8;
   }
 }
 `
