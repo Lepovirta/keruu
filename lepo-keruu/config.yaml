@@ -43,6 +43,12 @@ feeds:
   url: https://henrikwarne.com/feed/
 - name: Jessie Frazelle
   url: https://blog.jessfraz.com/index.xml
+- name: Felix Terkhorn
+  url: https://dev.to/feed/terkwood
+- name: zwischenzugs
+  url: https://zwischenzugs.com/2020/06/25/the-runbooks-project/feed/
+- name: ane
+  url: https://ane.github.io/feed.xml
 - name: Polar Squad
   url: https://medium.com/feed/polarsquad
 - name: Lepovirta
