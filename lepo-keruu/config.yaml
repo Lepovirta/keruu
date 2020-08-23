@@ -31,8 +31,6 @@ feeds:
   url: https://jvns.ca/atom.xml
 - name: rachelbythebay
   url: https://rachelbythebay.com/w/atom.xml
-- name: Red Hat Developer
-  url: https://developers.redhat.com/blog/feed/atom/
 - name: Fabien Sanglard
   url: https://fabiensanglard.net/rss.xml
 - name: Dan Luu
@@ -49,6 +47,18 @@ feeds:
   url: https://zwischenzugs.com/2020/06/25/the-runbooks-project/feed/
 - name: ane
   url: https://ane.github.io/feed.xml
+- name: Evan Jones
+  url: https://www.evanjones.ca/index.rss
+- name: Juho Snellman
+  url: https://www.snellman.net/blog/rss-index.xml
+- name: Steve Yegge
+  url: https://medium.com/feed/@steve.yegge
+- name: Fraktal
+  url: https://medium.com/feed/fraktal
+- name: Fuzzy Labs
+  url: https://medium.com/feed/fuzzylabsai
+- name: Software Arguments
+  url: https://medium.com/feed/software-arguments
 - name: Polar Squad
   url: https://medium.com/feed/polarsquad
 - name: Lepovirta
