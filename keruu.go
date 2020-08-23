@@ -38,8 +38,8 @@ func main() {
 		log.Fatalf("failed to read config from STDIN: %s", err)
 	}
 
-	if err := writeOutput(func (w io.Writer) error {
-		return feeds2html.Run(&config, w) 
+	if err := writeOutput(func(w io.Writer) error {
+		return feeds2html.Run(&config, w)
 	}); err != nil {
 		log.Panicf("feed aggregation failed: %s", err)
 	}
