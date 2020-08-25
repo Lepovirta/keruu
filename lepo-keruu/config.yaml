@@ -59,6 +59,8 @@ feeds:
   url: https://medium.com/feed/fuzzylabsai
 - name: Software Arguments
   url: https://medium.com/feed/software-arguments
+- name: Scott's Weblog
+  url: http://feeds.scottlowe.org/slowe/content/feed
 - name: Polar Squad
   url: https://medium.com/feed/polarsquad
 - name: Lepovirta
