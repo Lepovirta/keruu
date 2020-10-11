@@ -1,6 +1,11 @@
+include:
+- template: Dependency-Scanning.gitlab-ci.yml
+
 image: golang:1.14
 
 stages:
+- dependencies
+- test
 - build
 - deploy
 
@@ -14,11 +19,24 @@ workflow:
   - if: $CI_MERGE_REQUEST_ID
   - if: $CI_COMMIT_BRANCH == "master"
 
-before_script:
-- go mod download
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+  - mkdir -p .go
+  cache:
+    paths:
+    - .go/pkg/mod/
+
+gomod:
+  stage: dependencies
+  extends: .go-cache
+  script:
+  - go mod download
 
 lint:
-  stage: build
+  stage: test
+  extends: .go-cache
   image: golangci/golangci-lint:v1.27.0
   script:
   - golangci-lint run -v
@@ -26,7 +44,8 @@ lint:
   - if: $CI_PIPELINE_SOURCE != "schedule"
 
 test:
-  stage: build
+  stage: test
+  extends: .go-cache
   script:
   - go test -race -coverpkg ./... -coverprofile=coverage.txt -covermode=atomic ./...
   after_script:
@@ -36,6 +55,7 @@ test:
 
 build:
   stage: build
+  extends: .go-cache
   variables:
     CGO_ENABLED: "0"
   script:
