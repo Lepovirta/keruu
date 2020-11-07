@@ -7,17 +7,16 @@ stages:
 - dependencies
 - test
 - build
-- deploy
-
-cache:
-  key: yup
-  paths:
-  - /go/pkg
+- build-site
+- publish
 
 workflow:
   rules:
   - if: $CI_MERGE_REQUEST_ID
   - if: $CI_COMMIT_BRANCH == "master"
+
+variables:
+  NETLIFY_DIRECTORY: public
 
 .go-cache:
   variables:
@@ -25,6 +24,7 @@ workflow:
   before_script:
   - mkdir -p .go
   cache:
+    key: "$CI_COMMIT_REF_SLUG"
     paths:
     - .go/pkg/mod/
 
@@ -36,6 +36,8 @@ gomod:
 
 lint:
   stage: test
+  needs:
+  - gomod
   extends: .go-cache
   image: golangci/golangci-lint:v1.27.0
   script:
@@ -45,6 +47,8 @@ lint:
 
 test:
   stage: test
+  needs:
+  - gomod
   extends: .go-cache
   script:
   - go test -race -coverpkg ./... -coverprofile=coverage.txt -covermode=atomic ./...
@@ -55,6 +59,8 @@ test:
 
 build:
   stage: build
+  needs:
+  - gomod
   extends: .go-cache
   variables:
     CGO_ENABLED: "0"
@@ -63,20 +69,24 @@ build:
   artifacts:
     paths:
     - keruu
-    expire_in: 3 days
+    expire_in: 10 days
 
-publish-site:
-  stage: deploy
-  image: registry.gitlab.com/lepovirta/lepo-build
-  variables:
-    NETLIFY_DIRECTORY: public
+build-site:
+  stage: build-site
   before_script:
   - mkdir -p $NETLIFY_DIRECTORY
   script:
   - ./keruu -config lepo-keruu/config.yaml -output $NETLIFY_DIRECTORY/index.html
+  artifacts:
+    paths:
+    - $NETLIFY_DIRECTORY
+    expire_in: 2 days
+
+publish:
+  stage: publish
+  image: registry.gitlab.com/lepovirta/netlify-deployer:ci
+  script:
   - gitlab-deploy-site
-  dependencies:
-  - build
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_MERGE_REQUEST_ID
