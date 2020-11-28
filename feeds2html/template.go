@@ -17,6 +17,7 @@ const (
   <meta property="og:site_name" content="{{ .Config.Title }}">
   <meta property="og:type" content="website">
   <meta property="og:description" content="{{ .Config.Description }}">
+  <link rel="icon" href="data:,">
   <style>{{ .Config.CSS }}</style>
 </head>
 <body>
@@ -45,7 +46,7 @@ const (
 </html>
 `
 
-  defaultCSS = `body {
+	defaultCSS = `body {
   background-color: #f1e8fc;
   padding: 0;
   margin: 0;
