@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -70,7 +71,7 @@ func (c *Config) Init() {
 
 // FromYAMLFile reads the configuration from a YAML formatted file
 func (c *Config) FromYAMLFile(filename string) (err error) {
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		return err
 	}
