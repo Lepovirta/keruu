@@ -53,12 +53,16 @@ test:
   needs:
   - gomod
   extends: .go-cache
+  before_script:
+  - go get github.com/t-yuki/gocover-cobertura
   script:
   - go test -race -coverpkg ./... -coverprofile=coverage.txt -covermode=atomic ./...
-  after_script:
-  - bash <(curl -s https://codecov.io/bash)
+  - $GOPATH/bin/gocover-cobertura < coverage.txt > coverage.xml
   rules:
   - if: $CI_PIPELINE_SOURCE != "schedule"
+  artifacts:
+    reports:
+      cobertura: coverage.xml
 
 build:
   stage: build
