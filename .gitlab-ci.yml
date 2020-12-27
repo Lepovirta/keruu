@@ -3,15 +3,18 @@ include:
 - template: Security/License-Scanning.gitlab-ci.yml
 - template: Security/SAST.gitlab-ci.yml
 - template: Security/Secret-Detection.gitlab-ci.yml
+- template: Container-Scanning.gitlab-ci.yml
 
-image: golang:1.14
+image: golang:1.15
 
 stages:
-- dependencies
-- test
+- prepare
 - build
+- docker-build
+- test
 - build-site
 - publish
+- docker-release
 
 workflow:
   rules:
@@ -19,11 +22,11 @@ workflow:
   - if: $CI_COMMIT_BRANCH == "master"
 
 variables:
+  GOPATH: $CI_PROJECT_DIR/.go
   NETLIFY_DIRECTORY: public
+  CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
 
 .go-cache:
-  variables:
-    GOPATH: $CI_PROJECT_DIR/.go
   before_script:
   - mkdir -p .go
   cache:
@@ -32,10 +35,42 @@ variables:
     - .go/pkg/mod/
 
 gomod:
-  stage: dependencies
+  stage: prepare
   extends: .go-cache
   script:
   - go mod download
+
+build:
+  stage: build
+  needs:
+  - gomod
+  extends: .go-cache
+  variables:
+    CGO_ENABLED: "0"
+  script:
+  - go build -o keruu
+  artifacts:
+    paths:
+    - keruu
+    expire_in: 10 days
+
+.docker-job:
+  image: docker:latest
+  services:
+  - docker:dind
+  before_script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+build-docker-image:
+  stage: docker-build
+  extends: .docker-job
+  needs:
+  - build
+  variables:
+    CONTAINER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+  script:
+  - docker build -f Dockerfile --pull -t $CONTAINER_IMAGE .
+  - docker push $CONTAINER_IMAGE
 
 lint:
   stage: test
@@ -64,20 +99,6 @@ test:
     reports:
       cobertura: coverage.xml
 
-build:
-  stage: build
-  needs:
-  - gomod
-  extends: .go-cache
-  variables:
-    CGO_ENABLED: "0"
-  script:
-  - go build -o keruu
-  artifacts:
-    paths:
-    - keruu
-    expire_in: 10 days
-
 build-site:
   stage: build-site
   before_script:
@@ -98,3 +119,18 @@ publish:
   rules:
   - if: $CI_COMMIT_BRANCH == "master"
   - if: $CI_MERGE_REQUEST_ID
+
+publish-docker-image:
+  stage: docker-release
+  extends: .docker-job
+  needs:
+  - build-docker-image
+  variables:
+    CONTAINER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    CONTAINER_IMAGE_RELEASE: "$CI_REGISTRY_IMAGE:latest"
+  script:
+  - docker pull $CONTAINER_IMAGE
+  - docker tag $CONTAINER_IMAGE $CONTAINER_IMAGE_RELEASE
+  - docker push $CONTAINER_IMAGE_RELEASE
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
