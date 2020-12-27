@@ -9,8 +9,6 @@ fetch:
 feeds:
 - name: SRE Weekly
   url: http://sreweekly.com/feed/
-- name: Netflix Tech Blog
-  url: https://medium.com/feed/@NetflixTechBlog
 - name: Stephen Thorne
   url: https://medium.com/feed/@jerub
 - name: Cindy Sridharan
@@ -44,7 +42,7 @@ feeds:
 - name: Felix Terkhorn
   url: https://dev.to/feed/terkwood
 - name: zwischenzugs
-  url: https://zwischenzugs.com/2020/06/25/the-runbooks-project/feed/
+  url: https://zwischenzugs.com/feed/
 - name: ane
   url: https://ane.github.io/feed.xml
 - name: Evan Jones
@@ -61,6 +59,12 @@ feeds:
   url: https://medium.com/feed/software-arguments
 - name: Scott's Weblog
   url: http://feeds.scottlowe.org/slowe/content/feed
+- name: Scott Hanselman
+  url: http://feeds.hanselman.com/scotthanselman
+- name: Azure DevOps
+  url: https://devblogs.microsoft.com/devops/feed/
+- name: Windows CLI
+  url: https://devblogs.microsoft.com/commandline/feed/
 - name: Polar Squad
   url: https://medium.com/feed/polarsquad
 - name: Lepovirta
