@@ -7,64 +7,83 @@ fetch:
   httpTimeout: 10s
 
 feeds:
-- name: SRE Weekly
-  url: http://sreweekly.com/feed/
-- name: Stephen Thorne
-  url: https://medium.com/feed/@jerub
-- name: Cindy Sridharan
-  url: https://medium.com/feed/@copyconstruct
-- name: Gremlin
-  url: https://www.gremlin.com/rss.xml
-- name: High Scalability
-  url: http://feeds.feedburner.com/HighScalability
-- name: Honeycomb
-  url: https://www.honeycomb.io/feed/
-- name: GopherSRE
-  url: http://www.golangdevops.com/rss/
-- name: Lambda the Ultimate
-  url: http://lambda-the-ultimate.org/rss.xml
+# People
+- name: ane
+  url: https://ane.github.io/feed.xml
 - name: Brendan Gregg
   url: http://www.brendangregg.com/blog/rss.xml
-- name: Julia Evans
-  url: https://jvns.ca/atom.xml
-- name: rachelbythebay
-  url: https://rachelbythebay.com/w/atom.xml
-- name: Fabien Sanglard
-  url: https://fabiensanglard.net/rss.xml
+- name: Cindy Sridharan
+  url: https://medium.com/feed/@copyconstruct
+- name: Cloud Gardener
+  url: https://www.cloudgardener.dev/rss.xml
+- name: Cogitations of Topi
+  url: http://kettunen.io/index.xml
 - name: Dan Luu
   url: https://danluu.com/atom.xml
-- name: The Sharp End
-  url: https://sharpend.io/feed.xml
+- name: Evan Jones
+  url: https://www.evanjones.ca/index.rss
+- name: Fabien Sanglard
+  url: https://fabiensanglard.net/rss.xml
+- name: Felix Terkhorn
+  url: https://dev.to/feed/terkwood
 - name: Henrik Warne
   url: https://henrikwarne.com/feed/
 - name: Jessie Frazelle
   url: https://blog.jessfraz.com/index.xml
-- name: Felix Terkhorn
-  url: https://dev.to/feed/terkwood
-- name: zwischenzugs
-  url: https://zwischenzugs.com/feed/
-- name: ane
-  url: https://ane.github.io/feed.xml
-- name: Evan Jones
-  url: https://www.evanjones.ca/index.rss
+- name: John Savill
+  url: https://www.youtube.com/feeds/videos.xml?channel_id=UCpIn7ox7j7bH_OFj7tYouOQ
 - name: Juho Snellman
   url: https://www.snellman.net/blog/rss-index.xml
+- name: Julia Evans
+  url: https://jvns.ca/atom.xml
+- name: MS DevOps Dude
+  url: https://msdevopsdude.com/atom.xml
+- name: rachelbythebay
+  url: https://rachelbythebay.com/w/atom.xml
+- name: Scott Hanselman
+  url: http://feeds.hanselman.com/scotthanselman
+- name: Scott's Weblog
+  url: http://feeds.scottlowe.org/slowe/content/feed
+- name: The Sharp End
+  url: https://sharpend.io/feed.xml
+- name: Software Arguments
+  url: https://medium.com/feed/software-arguments
+- name: Stephen Thorne
+  url: https://medium.com/feed/@jerub
 - name: Steve Yegge
   url: https://medium.com/feed/@steve.yegge
+- name: zwischenzugs
+  url: https://zwischenzugs.com/feed/
+
+# Companies
 - name: Fraktal
   url: https://medium.com/feed/fraktal
 - name: Fuzzy Labs
   url: https://medium.com/feed/fuzzylabsai
-- name: Software Arguments
-  url: https://medium.com/feed/software-arguments
-- name: Scott's Weblog
-  url: http://feeds.scottlowe.org/slowe/content/feed
-- name: Scott Hanselman
-  url: http://feeds.hanselman.com/scotthanselman
+- name: Gremlin
+  url: https://www.gremlin.com/rss.xml
+- name: Honeycomb
+  url: https://www.honeycomb.io/feed/
+
+# Infrastructure/ops
 - name: Azure DevOps
   url: https://devblogs.microsoft.com/devops/feed/
+- name: High Scalability
+  url: http://feeds.feedburner.com/HighScalability
+- name: SRE Weekly
+  url: http://sreweekly.com/feed/
+
+# Programming
+- name: GopherSRE
+  url: http://www.golangdevops.com/rss/
+- name: Lambda the Ultimate
+  url: http://lambda-the-ultimate.org/rss.xml
+
+# Software
 - name: Windows CLI
   url: https://devblogs.microsoft.com/commandline/feed/
+
+# For testing purposes
 - name: Polar Squad
   url: https://medium.com/feed/polarsquad
 - name: Lepovirta
