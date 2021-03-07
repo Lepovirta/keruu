@@ -20,6 +20,8 @@ feeds:
   url: http://kettunen.io/index.xml
 - name: Dan Luu
   url: https://danluu.com/atom.xml
+- name: The Digital Antiquarian
+  url: https://www.filfre.net/feed/rss/
 - name: Evan Jones
   url: https://www.evanjones.ca/index.rss
 - name: Fabien Sanglard
@@ -30,8 +32,6 @@ feeds:
   url: https://henrikwarne.com/feed/
 - name: Jessie Frazelle
   url: https://blog.jessfraz.com/index.xml
-- name: John Savill
-  url: https://www.youtube.com/feeds/videos.xml?channel_id=UCpIn7ox7j7bH_OFj7tYouOQ
 - name: Juho Snellman
   url: https://www.snellman.net/blog/rss-index.xml
 - name: Julia Evans
@@ -66,8 +66,6 @@ feeds:
   url: https://www.honeycomb.io/feed/
 
 # Infrastructure/ops
-- name: Azure DevOps
-  url: https://devblogs.microsoft.com/devops/feed/
 - name: High Scalability
   url: http://feeds.feedburner.com/HighScalability
 - name: SRE Weekly
