@@ -12,8 +12,6 @@ stages:
 - build
 - docker-build
 - test
-- build-site
-- publish
 - docker-release
 
 workflow:
@@ -115,27 +113,6 @@ test:
   artifacts:
     reports:
       cobertura: coverage.xml
-
-build-site:
-  stage: build-site
-  before_script:
-  - mkdir -p $NETLIFY_DIRECTORY
-  script:
-  - ./keruu -config lepo-keruu/config.yaml -output $NETLIFY_DIRECTORY/index.html
-  - cp lepo-keruu/headers.txt $NETLIFY_DIRECTORY/_headers
-  artifacts:
-    paths:
-    - $NETLIFY_DIRECTORY
-    expire_in: 2 days
-
-publish:
-  stage: publish
-  image: registry.gitlab.com/lepovirta/netlify-deployer:ci
-  script:
-  - gitlab-deploy-site
-  rules:
-  - if: $CI_COMMIT_BRANCH == "master"
-  - if: $CI_MERGE_REQUEST_ID
 
 .docker-publish-job:
   stage: docker-release

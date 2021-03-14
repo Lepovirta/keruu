@@ -36,6 +36,10 @@ Keruu is configured using YAML. Here's all the configurations accepted by Keruu:
 
 Everything except the list of feeds is optional.
 
+## Example
+
+See [keruu-jkpl](https://gitlab.com/lepovirta/keruu-jkpl) for an example of Keruu in action.
+
 ## License
 
 GNU General Public License v3.0
