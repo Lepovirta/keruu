@@ -1,0 +1,11 @@
+# Produces an image that is easy to use
+# in CI pipelines such as Gitlab CI
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+COPY keruu /usr/local/bin/keruu
