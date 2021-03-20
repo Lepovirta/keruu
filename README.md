@@ -23,16 +23,21 @@ Keruu accepts the following CLI flags:
 
 Keruu is configured using YAML. Here's all the configurations accepted by Keruu:
 
-* `feeds`: a list of RSS/Atom feeds to aggregate. At least one feed must be provided.
-  * `name`: name of the feed (optional)
+* `feeds`: A list of RSS/Atom feeds to aggregate. At least one feed must be provided.
+  * `name`: Name of the feed (optional)
   * `url`: URL for the feed
-* `fetch`: a map containing the following configurations
-  * `httpTimeout`: duration for how long to wait for a single feed fetch (optional)
+* `fetch`: A map containing the following configurations
+  * `httpTimeout`: Duration for how long to wait for a single feed fetch (optional)
 * `aggregation`:
-  * `title`: title to use in the HTML output (optional)
-  * `description`: description to use in the HTML output (optional)
-  * `maxPosts`: maximum number of posts to include in the HTML output (optional)
-  * `css`: custom CSS for the HTML output (optional)
+  * `title`: Title to use in the HTML output (optional)
+  * `description`: Description to use in the HTML output (optional)
+  * `maxPosts`: Maximum number of posts to include in the HTML output (optional)
+  * `css`: Custom CSS for the HTML output (optional)
+* `links`: A list of links to generate per feed item. (optional)
+  * `name`: A name to display for the link
+  * `url`: An URL pattern to use for the link.
+    In the pattern, `$TITLE` will be replaced with the feed item title,
+    and `$URL` will be replaced by the feed item link.
 
 Everything except the list of feeds is optional.
 

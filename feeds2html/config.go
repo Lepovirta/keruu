@@ -27,6 +27,9 @@ aggregation:
   description: <STRING>
   maxPosts: <NUMBER>
   css: <STRING>
+links:
+  - name: <NAME>
+    url: <URL PATTERN>
 `
 
 // Config contains the configuration for the entire feed fetching, aggregation, and rendering process
@@ -34,6 +37,7 @@ type Config struct {
 	Feeds       []Feed            `yaml:"feeds"`
 	Fetch       FetchConfig       `yaml:"fetch,omitempty"`
 	Aggregation AggregationConfig `yaml:"aggregation,omitempty"`
+	Links       []Linker          `yaml:"links,omitempty"`
 }
 
 // Feed contains the details of a single feed
@@ -53,6 +57,12 @@ type AggregationConfig struct {
 	Description string `yaml:"description,omitempty"`
 	MaxPosts    int    `yaml:"maxPosts,omitempty"`
 	CSSString   string `yaml:"css,omitempty"`
+}
+
+// Linker contains link patterns to other sites
+type Linker struct {
+	Name       string `yaml:"name"`
+	URLPattern string `yaml:"url"`
 }
 
 // Init formats the config with default values

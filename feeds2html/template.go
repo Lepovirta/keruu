@@ -27,12 +27,23 @@ const (
     <p class="description">{{ .Config.Description }}</p>
   </header>
   <ul class="post-list">
-  {{- range $count, $post := .Posts }}
+  {{- range $_, $post := .Posts }}
   {{- with $post }}
     <li>
-      <a class="post-title" href="{{ .Link }}">{{ .Title }}</a>
-      <a class="post-feed-name" href="{{ .FeedLink }}">{{ .FeedName }}</a>
-      <time class="post-time" datetime="{{ .FormattedTime }}">{{ .FormattedTime }}</time>
+      <div class="post-head">
+        <a class="post-title" href="{{ .Link }}">{{ .Title }}</a>
+      </div>
+      <div class="post-meta">
+        <a class="post-feed" href="{{ .FeedLink }}">{{ .FeedName }}</a>
+        <time class="post-time" datetime="{{ .FormattedTime }}">{{ .FormattedTime }}</time>
+        {{- if .ExtLinks }}
+        <ul class="post-ext-links">
+        {{- range $_, $extLink := .ExtLinks }}
+          <li><a href="{{ $extLink.Link }}">{{ $extLink.Name }}</a></li>
+        {{- end }}
+        </ul>
+        {{- end }}
+      </div>
     </li>
   {{- end }}
   {{- end }}
@@ -94,19 +105,32 @@ footer {
   padding: 20px;
 }
 
+.post-list a {
+  text-decoration: none;
+}
+
+.post-list a:hover {
+  text-decoration: underline;
+}
+
 .post-list li {
   list-style: none;
   padding: 5px 0;
 }
 
-.post-title {
-  display: block;
+.post-head {
   font-size: 1.2em;
-  text-decoration: none;
 }
 
-.post-feed-name {
+.post-meta {
   font-size: 0.9em;
+}
+
+.post-count::after {
+  content: '.';
+}
+
+.post-feed {
   color: #f44;
   text-decoration: none;
 }
@@ -116,12 +140,42 @@ footer {
 }
 
 .post-time::before {
-  content: '@ ';
+  content: '| ';
 }
 
 .post-time {
   font-size: 0.9em;
   color: #484;
+}
+
+.post-ext-links {
+  display: inline;
+  padding: 0;
+}
+
+.post-ext-links::before {
+  content: '|';
+  color: #18798e;
+}
+
+.post-ext-links li {
+  display: inline;
+}
+
+.post-ext-links li::after {
+  content: ',';
+}
+
+.post-ext-links li:nth-last-child(1)::after {
+  content: '';
+}
+
+.post-ext-links a {
+  color: #18798e;
+}
+
+.post-ext-links a:visited {
+  color: #104754;
 }
 
 @media screen and (max-width:700px) {

@@ -2,7 +2,9 @@ package feeds2html
 
 import (
 	"sort"
+	"strings"
 	"time"
+	"net/url"
 
 	"github.com/mmcdole/gofeed"
 )
@@ -19,9 +21,16 @@ type feedPost struct {
 	Title    string
 	Link     string
 	Time     *time.Time
+	ExtLinks  []extLink
+}
+
+type extLink struct {
+	Name string
+	Link string
 }
 
 func goFeedItemToPost(
+	config *Config,
 	feed *Feed,
 	parsedFeed *gofeed.Feed,
 	item *gofeed.Item,
@@ -37,6 +46,7 @@ func goFeedItemToPost(
 		Title:    item.Title,
 		Link:     item.Link,
 		Time:     timeFromGoFeedItem(item),
+		ExtLinks: extLinksFromGoFeedItem(config, item),
 	}
 
 	return
@@ -49,6 +59,23 @@ func timeFromGoFeedItem(item *gofeed.Item) *time.Time {
 		return item.UpdatedParsed
 	}
 	return nil
+}
+
+func extLinksFromGoFeedItem(config *Config, item *gofeed.Item) []extLink {
+	extLinks := make([]extLink, 0, len(config.Links))
+	for _, linker := range config.Links {
+		extLinks = append(extLinks, extLink{
+			Name: linker.Name,
+			Link: extLinkURLPatternToURL(&linker, item),
+		})
+	}
+	return extLinks
+}
+
+func extLinkURLPatternToURL(linker *Linker, item *gofeed.Item) (u string) {
+	u = strings.ReplaceAll(linker.URLPattern, "$TITLE", url.QueryEscape(item.Title))
+	u = strings.ReplaceAll(u, "$URL", url.QueryEscape(item.Link))
+	return
 }
 
 func (a *aggregation) push(post *feedPost) {
