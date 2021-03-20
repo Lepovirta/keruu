@@ -66,13 +66,13 @@ func extLinksFromGoFeedItem(config *Config, item *gofeed.Item) []extLink {
 	for _, linker := range config.Links {
 		extLinks = append(extLinks, extLink{
 			Name: linker.Name,
-			Link: extLinkURLPatternToURL(&linker, item),
+			Link: extLinkPatternToURL(&linker, item),
 		})
 	}
 	return extLinks
 }
 
-func extLinkURLPatternToURL(linker *Linker, item *gofeed.Item) (u string) {
+func extLinkPatternToURL(linker *Linker, item *gofeed.Item) (u string) {
 	u = strings.ReplaceAll(linker.URLPattern, "$TITLE", url.QueryEscape(item.Title))
 	u = strings.ReplaceAll(u, "$URL", url.QueryEscape(item.Link))
 	return

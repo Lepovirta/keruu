@@ -2,9 +2,15 @@ package feeds2html
 
 import "net/url"
 
-// URL wraps the standard library URL to provide extra functionality
+// URL wraps the standard library URL to provide extra functionality.
+// Specifically, it provides YAML unmarshalling.
 type URL struct {
 	*url.URL
+}
+
+// NewURL Convert Go URL type to our custom URL type
+func NewURL(u *url.URL) URL {
+	return URL{u}
 }
 
 // UnmarshalYAML parses an URL from a YAML formatted string
