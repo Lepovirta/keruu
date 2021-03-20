@@ -63,6 +63,15 @@ The minimal image is optimized for the use in the command-line and scripting.
 Besides the Keruu tool, it only includes the bare minimum system dependencies.
 Running the container runs the Keruu tool directly and the container parameters are passed to the tool.
 
+Example:
+
+```
+docker run -v $(pwd):/workspace:z \
+  registry.gitlab.com/lepovirta/keruu \
+  -config /workspace/config.yaml \
+  -output /workspace/output.html
+```
+
 ### CI
 
 Image tag: `registry.gitlab.com/lepovirta/keruu-ci`
@@ -70,6 +79,23 @@ Image tag: `registry.gitlab.com/lepovirta/keruu-ci`
 The CI image is optimized for the use in CI pipelines that use containers as pipeline steps such as Gitlab CI.
 In addition to the Keruu tool, it includes the basic Linux utilities from Ubuntu, curl, Git, and a few other useful tools.
 By default, the container runs Bash, which is often used for executing CI step scripts.
+
+Example use in Gitlab CI with Gitlab Pages:
+
+```
+pages:
+  stage: publish
+  image: registry.gitlab.com/lepovirta/keruu:ci
+  before_script:
+  - mkdir -p public
+  script:
+  - keruu -config config.yaml -output public/index.html
+  artifacts:
+    paths:
+    - public
+  rules:
+  - if: $CI_COMMIT_BRANCH == "master"
+```
 
 ## License
 
