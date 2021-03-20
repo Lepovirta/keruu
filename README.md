@@ -11,6 +11,12 @@ After that, you can use `go get` to install Keruu:
 
 The executable should now be in path `$GOPATH/bin/keruu` (or `~/go/bin/keruu`).
 
+Alternatively, if you have [Docker](https://docker.com/) installed, you can run the Docker image from the following location:
+
+```
+registry.gitlab.com/lepovirta/keruu
+```
+
 ## Usage
 
 Keruu accepts the following CLI flags:
@@ -43,7 +49,27 @@ Everything except the list of feeds is optional.
 
 ## Example
 
-See [keruu-jkpl](https://gitlab.com/lepovirta/keruu-jkpl) for an example of Keruu in action.
+See [keruu-example](https://gitlab.com/lepovirta/keruu-example) for an example of Keruu in action.
+
+## Docker
+
+There's two Docker images available for Keruu.
+
+### Minimal
+
+Image tag: `registry.gitlab.com/lepovirta/keruu`
+
+The minimal image is optimized for the use in the command-line and scripting.
+Besides the Keruu tool, it only includes the bare minimum system dependencies.
+Running the container runs the Keruu tool directly and the container parameters are passed to the tool.
+
+### CI
+
+Image tag: `registry.gitlab.com/lepovirta/keruu-ci`
+
+The CI image is optimized for the use in CI pipelines that use containers as pipeline steps such as Gitlab CI.
+In addition to the Keruu tool, it includes the basic Linux utilities from Ubuntu, curl, Git, and a few other useful tools.
+By default, the container runs Bash, which is often used for executing CI step scripts.
 
 ## License
 
