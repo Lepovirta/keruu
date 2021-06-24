@@ -19,7 +19,14 @@ type state struct {
 
 func newState(config *Config) *state {
 	feedParser := gofeed.NewParser()
+
+	httpTranport := http.DefaultTransport.(*http.Transport).Clone()
+	httpTranport.MaxIdleConns = 100
+	httpTranport.MaxIdleConnsPerHost = 100
+	httpTranport.MaxConnsPerHost = 100
+
 	feedParser.Client = &http.Client{
+		Transport: httpTranport,
 		Timeout: config.Fetch.HTTPTimeout,
 	}
 
@@ -31,7 +38,7 @@ func newState(config *Config) *state {
 	return &state{
 		config:      config,
 		feedParser:  feedParser,
-		postCh:      make(chan *feedPost, 100),
+		postCh:      make(chan *feedPost, 1000),
 		aggregation: aggregation,
 	}
 }
