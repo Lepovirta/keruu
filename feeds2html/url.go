@@ -8,7 +8,7 @@ type URL struct {
 	*url.URL
 }
 
-// NewURL Convert Go URL type to our custom URL type
+// NewURL converts Go URL type to our custom URL type
 func NewURL(u *url.URL) URL {
 	return URL{u}
 }

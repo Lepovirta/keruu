@@ -17,6 +17,12 @@ import (
 const ConfigTemplateYAML = `feeds:
   - name: <NAME>
     url: <URL>
+	exclude:
+	  - <REGEX>
+	  ...
+	include:
+	  - <REGEX>
+	  ...
   - name: <NAME>
     url: <URL>
   - ...
@@ -27,6 +33,7 @@ aggregation:
   description: <STRING>
   maxPosts: <NUMBER>
   css: <STRING>
+  timeout: <DURATION>
 links:
   - name: <NAME>
     url: <URL PATTERN>
@@ -42,8 +49,10 @@ type Config struct {
 
 // Feed contains the details of a single feed
 type Feed struct {
-	Name string `yaml:"name"`
-	URL  URL    `yaml:"url"`
+	Name    string `yaml:"name"`
+	URL     URL    `yaml:"url"`
+	Exclude []RE   `yaml:"exclude,omitempty"`
+	Include []RE   `yaml:"include,omitempty"`
 }
 
 // FetchConfig contains the feed fetching related configurations
@@ -53,10 +62,11 @@ type FetchConfig struct {
 
 // AggregationConfig contains the feed aggregation related configurations
 type AggregationConfig struct {
-	Title       string `yaml:"title,omitempty"`
-	Description string `yaml:"description,omitempty"`
-	MaxPosts    int    `yaml:"maxPosts,omitempty"`
-	CSSString   string `yaml:"css,omitempty"`
+	Title       string         `yaml:"title,omitempty"`
+	Description string         `yaml:"description,omitempty"`
+	MaxPosts    int            `yaml:"maxPosts,omitempty"`
+	CSSString   string         `yaml:"css,omitempty"`
+	Timeout     *time.Duration `yaml:"timeout,omitempty"`
 }
 
 // Linker contains link patterns to other sites

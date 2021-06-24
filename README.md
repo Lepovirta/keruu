@@ -30,22 +30,24 @@ Keruu accepts the following CLI flags:
 Keruu is configured using YAML. Here's all the configurations accepted by Keruu:
 
 * `feeds`: A list of RSS/Atom feeds to aggregate. At least one feed must be provided.
-  * `name`: Name of the feed (optional)
+  * `name` (optional): Name of the feed
   * `url`: URL for the feed
-* `fetch`: A map containing the following configurations
-  * `httpTimeout`: Duration for how long to wait for a single feed fetch (optional)
-* `aggregation`:
-  * `title`: Title to use in the HTML output (optional)
-  * `description`: Description to use in the HTML output (optional)
-  * `maxPosts`: Maximum number of posts to include in the HTML output (optional)
-  * `css`: Custom CSS for the HTML output (optional)
-* `links`: A list of links to generate per feed item. (optional)
+  * `exclude` (optional): A list of regular expression patterns to match against the feed post titles.
+    If a post title matches any of the expressions, the post is excluded from the HTML output.
+  * `include` (optional): A list of regular expression patterns to match against the feed post titles.
+    Only posts that match the expressions are included in the HTML output unless they match the expressions in the `exclude` list.
+* `fetch` (optional): A map containing the following configurations
+  * `httpTimeout` (optional): Duration for how long to wait for a single feed fetch
+* `aggregation` (optional):
+  * `title` (optional): Title to use in the HTML output
+  * `description` (optional): Description to use in the HTML output
+  * `maxPosts` (optional): Maximum number of posts to include in the HTML output
+  * `css` (optional): Custom CSS for the HTML output
+* `links` (optional): A list of links to generate per feed item.
   * `name`: A name to display for the link
   * `url`: An URL pattern to use for the link.
     In the pattern, `$TITLE` will be replaced with the feed item title,
     and `$URL` will be replaced by the feed item link.
-
-Everything except the list of feeds is optional.
 
 ## Example
 

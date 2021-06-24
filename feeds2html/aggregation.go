@@ -29,12 +29,31 @@ type extLink struct {
 	Link string
 }
 
+func isIncluded(feed *Feed, s string) bool {
+	// Always exclude first
+	for _, filter := range feed.Exclude {
+		if filter.MatchString(s) {
+			return false
+		}
+	}
+
+	for _, filter := range feed.Include {
+		if filter.MatchString(s) {
+			return true
+		}
+	}
+
+	// No match on filters?
+	// Only include it, if there was no include filters set
+	return len(feed.Include) == 0
+}
+
 func goFeedItemToPost(
 	config *Config,
 	feed *Feed,
 	parsedFeed *gofeed.Feed,
 	item *gofeed.Item,
-) (post *feedPost, err error) {
+) (post *feedPost) {
 	feedName := feed.Name
 	if feedName == "" {
 		feedName = parsedFeed.Title

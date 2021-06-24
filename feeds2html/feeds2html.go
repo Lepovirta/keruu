@@ -92,12 +92,10 @@ func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
 		return
 	}
 	for _, item := range parsedFeed.Items {
-		post, err := goFeedItemToPost(s.config, feed, parsedFeed, item)
-		if err != nil {
-			log.Printf("error processing post: %s", err)
-			break
+		if isIncluded(feed, item.Title) {
+			post := goFeedItemToPost(s.config, feed, parsedFeed, item)
+			s.postCh <- post
 		}
-		s.postCh <- post
 	}
 }
 
