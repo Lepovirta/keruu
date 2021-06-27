@@ -58,15 +58,15 @@ const (
 `
 
 	defaultCSS = `body {
-  background-color: #f1e8fc;
+  background-color: #f7f0ff;
   padding: 0;
   margin: 0;
   font-family: sans-serif;
 }
 
 main {
-  width: 700px;
-  margin: 10px auto;
+  max-width: 760px;
+  margin: 20px auto;
 }
 
 header {
@@ -178,9 +178,9 @@ footer {
   color: #104754;
 }
 
-@media screen and (max-width:700px) {
+@media screen and (max-width:760px) {
   main {
-    width: auto;
+    max-width: auto;
     margin: 0;
   }
 }
