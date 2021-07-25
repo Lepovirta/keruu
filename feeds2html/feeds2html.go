@@ -2,10 +2,12 @@ package feeds2html
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"sync"
+	"sync/atomic"
 
 	"github.com/mmcdole/gofeed"
 )
@@ -14,6 +16,7 @@ type state struct {
 	config      *Config
 	feedParser  *gofeed.Parser
 	aggregation *aggregation
+	errorsFound int32
 	mutex       sync.Mutex
 }
 
@@ -65,7 +68,15 @@ func (s *state) run(out io.Writer) error {
 
 	// Post-process and write output
 	s.postProcess()
-	return s.writeHTML(out)
+	if err := s.writeHTML(out); err != nil {
+		return err
+	}
+
+	// Check for errors
+	if s.errorsFound > 0 {
+		return fmt.Errorf("%d feed parsing errors found", s.errorsFound)
+	}
+	return nil
 }
 
 func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
@@ -74,6 +85,9 @@ func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
 	parsedFeed, err := s.feedParser.ParseURL(feed.URL.String())
 	if err != nil {
 		log.Printf("error processing feed '%s': %s", feed.URL, err)
+		if s.config.Fetch.PropagateErrors {
+			atomic.AddInt32(&s.errorsFound, 1)
+		}
 		return
 	}
 

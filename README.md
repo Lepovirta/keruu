@@ -38,6 +38,7 @@ Keruu is configured using YAML. Here's all the configurations accepted by Keruu:
     Only posts that match the expressions are included in the HTML output unless they match the expressions in the `exclude` list.
 * `fetch` (optional): A map containing the following configurations
   * `httpTimeout` (optional): Duration for how long to wait for a single feed fetch
+  * `propagateErrors` (optional): When set to `true`, the program will return an error code when feed fetching or parsing fails for one or more feeds. This can be useful when you want to catch feed errors in scripts.
 * `aggregation` (optional):
   * `title` (optional): Title to use in the HTML output
   * `description` (optional): Description to use in the HTML output

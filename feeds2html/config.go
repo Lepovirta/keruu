@@ -28,6 +28,7 @@ const ConfigTemplateYAML = `feeds:
   - ...
 fetch:
   httpTimeout: <DURATION>
+  propagateErrors <BOOLEAN>
 aggregation:
   title: <STRING>
   description: <STRING>
@@ -57,7 +58,8 @@ type Feed struct {
 
 // FetchConfig contains the feed fetching related configurations
 type FetchConfig struct {
-	HTTPTimeout time.Duration `yaml:"httpTimeout,omitempty"`
+	HTTPTimeout     time.Duration `yaml:"httpTimeout,omitempty"`
+	PropagateErrors bool          `yaml:"propagateErrors"`
 }
 
 // AggregationConfig contains the feed aggregation related configurations
