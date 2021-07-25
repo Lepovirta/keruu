@@ -13,8 +13,8 @@ import (
 type state struct {
 	config      *Config
 	feedParser  *gofeed.Parser
-	postCh      chan *feedPost
 	aggregation *aggregation
+	mutex       sync.Mutex
 }
 
 func newState(config *Config) *state {
@@ -27,7 +27,7 @@ func newState(config *Config) *state {
 
 	feedParser.Client = &http.Client{
 		Transport: httpTranport,
-		Timeout: config.Fetch.HTTPTimeout,
+		Timeout:   config.Fetch.HTTPTimeout,
 	}
 
 	aggregation := &aggregation{
@@ -38,7 +38,6 @@ func newState(config *Config) *state {
 	return &state{
 		config:      config,
 		feedParser:  feedParser,
-		postCh:      make(chan *feedPost, 1000),
 		aggregation: aggregation,
 	}
 }
@@ -52,12 +51,7 @@ func Run(config *Config, out io.Writer) error {
 }
 
 func (s *state) run(out io.Writer) error {
-	var wgJoiner sync.WaitGroup
 	var wgFeeds sync.WaitGroup
-
-	// Start feed item joiner
-	wgJoiner.Add(1)
-	go s.joinFeedItems(&wgJoiner)
 
 	// Fetch feeds
 	for _, feed := range s.config.Feeds {
@@ -68,19 +62,10 @@ func (s *state) run(out io.Writer) error {
 
 	// Wait for everything to finish
 	wgFeeds.Wait()
-	close(s.postCh)
-	wgJoiner.Wait()
 
 	// Post-process and write output
 	s.postProcess()
 	return s.writeHTML(out)
-}
-
-func (s *state) joinFeedItems(wg *sync.WaitGroup) {
-	defer wg.Done()
-	for post := range s.postCh {
-		s.aggregation.push(post)
-	}
 }
 
 func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
@@ -91,12 +76,18 @@ func (s *state) fetchFeed(feed *Feed, wg *sync.WaitGroup) {
 		log.Printf("error processing feed '%s': %s", feed.URL, err)
 		return
 	}
+
+	posts := make([]*feedPost, 0, len(parsedFeed.Items))
 	for _, item := range parsedFeed.Items {
 		if isIncluded(feed, item.Title) {
 			post := goFeedItemToPost(s.config, feed, parsedFeed, item)
-			s.postCh <- post
+			posts = append(posts, post)
 		}
 	}
+
+	defer s.mutex.Unlock()
+	s.mutex.Lock()
+	s.aggregation.push(posts...)
 }
 
 func (s *state) postProcess() {

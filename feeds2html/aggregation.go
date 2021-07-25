@@ -1,10 +1,10 @@
 package feeds2html
 
 import (
+	"net/url"
 	"sort"
 	"strings"
 	"time"
-	"net/url"
 
 	"github.com/mmcdole/gofeed"
 )
@@ -21,7 +21,7 @@ type feedPost struct {
 	Title    string
 	Link     string
 	Time     *time.Time
-	ExtLinks  []extLink
+	ExtLinks []extLink
 }
 
 type extLink struct {
@@ -97,8 +97,8 @@ func extLinkPatternToURL(linker *Linker, item *gofeed.Item) (u string) {
 	return
 }
 
-func (a *aggregation) push(post *feedPost) {
-	a.Posts = append(a.Posts, post)
+func (a *aggregation) push(post ...*feedPost) {
+	a.Posts = append(a.Posts, post...)
 }
 
 func (a *aggregation) finalize() {
