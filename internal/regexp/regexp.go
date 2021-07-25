@@ -1,4 +1,4 @@
-package feeds2html
+package regexp
 
 import (
 	"regexp"
@@ -12,6 +12,11 @@ type RE struct {
 
 // NewRE converts Go Regexp to our custom RE type
 func NewRE(re *regexp.Regexp) RE {
+	return RE{re}
+}
+
+func MustCompile(res string) RE {
+	re := regexp.MustCompile(res)
 	return RE{re}
 }
 

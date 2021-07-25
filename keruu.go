@@ -8,26 +8,29 @@ import (
 	"log"
 	"os"
 
-	"gitlab.com/lepovirta/keruu/feeds2html"
+	"gitlab.com/lepovirta/keruu/internal/aggregation"
+	"gitlab.com/lepovirta/keruu/internal/config"
+	"gitlab.com/lepovirta/keruu/internal/fetch"
+	"gitlab.com/lepovirta/keruu/internal/file"
 )
 
-var configPath string
-var outputPath string
-var config feeds2html.Config
+var cfgPath string
+var outPath string
+var cfg config.Config
 
 func init() {
 	// Setup CLI flags
-	flag.StringVar(&configPath, "config", "STDIN", "Location of the configuration file")
-	flag.StringVar(&outputPath, "output", "STDOUT", "Location of the HTML output file")
+	flag.StringVar(&cfgPath, "config", "STDIN", "Location of the configuration file")
+	flag.StringVar(&outPath, "output", "STDOUT", "Location of the HTML output file")
 
 	// Init config
-	config.Init()
+	cfg.Init()
 
 	// Setup custom usage function
 	defaultUsage := flag.Usage
 	flag.Usage = func() {
 		defaultUsage()
-		fmt.Fprintf(flag.CommandLine.Output(), "\nConfiguration format:\n\n%s", feeds2html.ConfigTemplateYAML)
+		fmt.Fprintf(flag.CommandLine.Output(), "\nConfiguration format:\n\n%s", config.TemplateYAML)
 	}
 }
 
@@ -39,7 +42,14 @@ func main() {
 	}
 
 	if err := writeOutput(func(w io.Writer) error {
-		return feeds2html.Run(&config, w)
+		// Error checking is intentionally skipped here to report it later
+		posts, err := fetch.Run(&cfg.Fetch, cfg.Feeds, cfg.Links)
+
+		aggregation := aggregation.New(&cfg.Aggregation, posts)
+		if err := aggregation.ToHTML(w); err != nil {
+			return err
+		}
+		return err
 	}); err != nil {
 		log.Panicf("feed aggregation failed: %s", err)
 	}
@@ -47,38 +57,25 @@ func main() {
 
 func readConfig() error {
 	if isSTDIN() {
-		return config.FromSTDIN()
+		return cfg.FromSTDIN()
 	}
-	return config.FromYAMLFile(configPath)
+	return cfg.FromYAMLFile(cfgPath)
 }
 
 func writeOutput(f func(io.Writer) error) error {
-	var writer io.Writer
 	if isSTDOUT() {
-		writer = os.Stdout
-	} else {
-		file, err := os.Create(outputPath)
-		if err != nil {
+		writer := bufio.NewWriter(os.Stdout)
+		if err := f(writer); err != nil {
 			return err
 		}
-		defer func() {
-			err := file.Close()
-			if err != nil {
-				log.Printf("failed to close output file: %s", err)
-			}
-		}()
-		writer = file
+		return writer.Flush()
+	} else {
+		return file.WithFileWriter(outPath, f)
 	}
-
-	bufWriter := bufio.NewWriter(writer)
-	if err := f(bufWriter); err != nil {
-		return err
-	}
-	return bufWriter.Flush()
 }
 
 func isSTDIN() bool {
-	switch configPath {
+	switch cfgPath {
 	case "", "-", "STDIN":
 		return true
 	}
@@ -86,7 +83,7 @@ func isSTDIN() bool {
 }
 
 func isSTDOUT() bool {
-	switch outputPath {
+	switch outPath {
 	case "", "-", "STDOUT":
 		return true
 	}

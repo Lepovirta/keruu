@@ -1,4 +1,4 @@
-package feeds2html
+package url
 
 import (
 	"net/url"

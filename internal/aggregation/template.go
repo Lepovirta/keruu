@@ -1,4 +1,4 @@
-package feeds2html
+package aggregation
 
 import (
 	"html/template"
@@ -228,6 +228,6 @@ func init() {
 }
 
 // renderHTML writes the given aggregation to the given writer in HTML format
-func renderHTML(w io.Writer, a *aggregation) error {
+func renderHTML(w io.Writer, a *Aggregation) error {
 	return htmlTemplate.Execute(w, a)
 }
