@@ -43,6 +43,11 @@ Keruu is configured using YAML. Here's all the configurations accepted by Keruu:
   * `title` (optional): Title to use in the HTML output
   * `description` (optional): Description to use in the HTML output
   * `maxPosts` (optional): Maximum number of posts to include in the HTML output
+  * `grouping` (optional): Group posts in the HTML output. These options are available.
+    * `monthly`: Group posts by month (default)
+    * `weekly`: Group posts by week number of the year
+    * number (e.g. `10`): Group posts into groups of given size
+    * `none` or empty string: No grouping at all
   * `css` (optional): Custom CSS for the HTML output
 * `links` (optional): A list of links to generate per feed item.
   * `name`: A name to display for the link
