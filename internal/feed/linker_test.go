@@ -24,6 +24,6 @@ func TestExtLinkPatternToURL(t *testing.T) {
 	url1 := linker1.goFeedItemToExtLink(&post)
 	url2 := linker2.goFeedItemToExtLink(&post)
 
-	assert.Equal(t, "https://duckduckgo.com/?q=Hello+World", url1)
-	assert.Equal(t, "https://old.reddit.com/submit?url=http%3A%2F%2Fexample.org", url2)
+	assert.Equal(t, "https://duckduckgo.com/?q=Hello+World", url1.Link)
+	assert.Equal(t, "https://old.reddit.com/submit?url=http%3A%2F%2Fexample.org", url2.Link)
 }
