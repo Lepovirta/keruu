@@ -1,6 +1,7 @@
 package aggregation
 
 import (
+	"fmt"
 	"io"
 	"sort"
 	"time"
@@ -32,27 +33,29 @@ func New(config *Config, posts []*feed.Post) *Aggregation {
 
 func groupPosts(posts []*feed.Post, groupName func(*feed.Post) string) []PostGroup {
 	groupIndex := 0
-	groups := make([]PostGroup, 5*12)
+	groups := make([]PostGroup, 0, 60)
+	groups = append(groups, PostGroup{})
+
 	for _, post := range posts {
 		name := groupName(post)
 		group := &groups[groupIndex]
 
+		// If the current group name doesn't match the computed name,
+		// create a new group.
 		if group.Name != "" && group.Name != name {
-			// If the current group doesn't match with the name,
-			// create a new group for the post.
 			groupIndex += 1
+			groups = append(groups, PostGroup{})
 			group = &groups[groupIndex]
 		}
 
+		// Initialize the group if needed
 		if group.Name == "" {
-			// Empty group => initialize
 			group.Name = name
 			group.Posts = make([]*feed.Post, 100)
-			group.Posts = append(group.Posts, post)
-		} else {
-			// Existing group => append
-			group.Posts = append(group.Posts, post)
 		}
+
+		// Finally, add the post to the current group
+		group.Posts = append(group.Posts, post)
 	}
 	return groups
 }
