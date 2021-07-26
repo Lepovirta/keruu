@@ -5,7 +5,7 @@ include:
 - template: Security/Secret-Detection.gitlab-ci.yml
 - template: Container-Scanning.gitlab-ci.yml
 
-image: golang:1.15
+image: golang:1.16
 
 stages:
 - prepare
@@ -92,7 +92,7 @@ lint:
   needs:
   - gomod
   extends: .go-cache
-  image: golangci/golangci-lint:v1.27.0
+  image: golangci/golangci-lint:v1.41.1
   script:
   - golangci-lint run -v
   rules:
