@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width,initial-scale=1" name="viewport">
+  <title>{{ .Config.Title }}</title>
+  <meta name="description" content="{{ .Config.Description }}">
+  <meta property="og:title" content="{{ .Config.Title }}">
+  <meta property="og:site_name" content="{{ .Config.Title }}">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="{{ .Config.Description }}">
+  <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAA
+  AAAAAACNEUQA////AAAAAABJjAAAclIAAEpSAABKUgAAclIAAAAAAAAAAAAAAAAAAAAAAABm/AAA
+  bMAAAHj8AABswAAAZvwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+  <style>{{ .Config.CSS }}</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1 class="title">{{ .Config.Title }}</h1>
+    <p class="description">{{ .Config.Description }}</p>
+  </header>
+  {{- range $_, $group := .PostGroups}}
+  {{- if $group.Posts }}
+  <div class="post-group">
+    {{- if $group.Name }}
+    <h2 class="post-group-name">{{ $group.Name }}</h2>
+    {{- end }}
+    <ul class="post-list">
+      {{- range $_, $post := $group.Posts }}
+      {{- with $post }}
+      <li>
+        <div class="post-head">
+          <a class="post-title" href="{{ .Link }}">{{ .Title }}</a>
+        </div>
+        <div class="post-meta">
+          <a class="post-feed" href="{{ .FeedLink }}">{{ .FeedName }}</a>
+          <time class="post-time" datetime="{{ .FormattedTime }}">{{ .FormattedTime }}</time>
+          {{- if .ExtLinks }}
+          <ul class="post-ext-links">
+            {{- range $_, $extLink := .ExtLinks }}
+            <li><a href="{{ $extLink.Link }}">{{ $extLink.Name }}</a></li>
+            {{- end }}
+          </ul>
+          {{- end }}
+        </div>
+      </li>
+      {{- end }}
+      {{- end }}
+    </ul>
+  </div>
+  {{- end }}
+  {{- end }}
+  <footer>
+    Generated using <a href="https://gitlab.com/lepovirta/keruu">keruu</a>
+    at {{ .FormattedTime }}.
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,174 @@
+body {
+  background-color: #fff;
+  color: #444;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+header {
+  margin: 10px 0 30px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+a {
+  color: #00e;
+}
+
+a:visited {
+  color: #551abb;
+}
+
+footer {
+  padding: 10px 0;
+  margin: 20px 0;
+  font-size: 0.9em;
+  text-align: right;
+  border-top: 1px solid #ccc;
+}
+
+.title {
+  margin: 4px 0;
+  font-size: 2.6em;
+}
+
+.description {
+  margin: 4px 0;
+  font-size: 1.6em;
+}
+
+.post-group-name {
+  border-left: 10px solid #444;
+  padding-left: 10px;
+  margin-bottom: 4px;
+  font-size: 1.6em;
+}
+
+.post-list {
+  margin: 0;
+  padding: 0;
+}
+
+.post-list a {
+  text-decoration: none;
+}
+
+.post-list a:hover {
+  text-decoration: underline;
+}
+
+.post-list li {
+  list-style: none;
+  padding: 5px 0;
+}
+
+.post-head {
+  font-size: 1.2em;
+}
+
+.post-meta {
+  font-size: 0.9em;
+}
+
+.post-count::after {
+  content: '.';
+}
+
+.post-feed {
+  color: #f44;
+  text-decoration: none;
+}
+
+.post-feed:visited {
+  color: #b22;
+}
+
+.post-time::before {
+  content: '| ';
+}
+
+.post-time {
+  font-size: 0.9em;
+  color: #484;
+}
+
+.post-ext-links {
+  display: inline;
+  padding: 0;
+}
+
+.post-ext-links::before {
+  content: '|';
+  color: #18798e;
+}
+
+.post-ext-links li {
+  display: inline;
+}
+
+.post-ext-links li::after {
+  content: ',';
+}
+
+.post-ext-links li:nth-last-child(1)::after {
+  content: '';
+}
+
+.post-ext-links a {
+  color: #18798e;
+}
+
+.post-ext-links a:visited {
+  color: #104754;
+}
+
+@media screen and (max-width:760px) {
+  main {
+    max-width: auto;
+    margin: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #111;
+    color: #fdfdfd;
+  }
+  header {
+    border-color: #444;
+  }
+  a {
+    color: #aef;
+  }
+  a:visited {
+    color: #8be;
+  }
+  footer {
+    color: #fdfdfd;
+    border-color: #444;
+  }
+  .post-group-name {
+    border-color: #fdfdfd;
+  }
+  .post-feed {
+    color: #f88;
+  }
+  .post-feed:visited {
+    color: #b66;
+  }
+  .post-time {
+    color: #8f8;
+  }
+  .post-ext-links a {
+    color: #32dbff;
+  }
+  .post-ext-links a:visited {
+    color: #178298;
+  }
+}
